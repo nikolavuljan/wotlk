@@ -102,9 +102,9 @@ var ItemOverrides = []*proto.UIItem{
 			stats.Intellect:  58,
 			stats.SpellPower: 621,
 			stats.SpellCrit:  39,
-			stats.SpellHaste: 57,
+			stats.SpellHaste: 58,
 			stats.MeleeCrit:  39,
-			stats.MeleeHaste: 57,
+			stats.MeleeHaste: 58,
 		}.ToFloatArray(),
 		GemSockets: []proto.GemColor{
 			proto.GemColor_GemColorYellow,
