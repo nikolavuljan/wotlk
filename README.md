@@ -1,5 +1,5 @@
-wowsims WotLK with 3.3.5 items and proc effects, etc.
+forked from oomshroom
 
-Shaman Flametongue Weapon ICD from Classic removed by Tobi.
+quick and dirty fix for tooltips
 
-Compiled version available [here](https://oomshroom.github.io/wotlk).
+added doomhammer and nightwing
