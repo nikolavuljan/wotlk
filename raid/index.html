@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>WOTLK Raid Simulator</title>
+    <meta charset="utf-8">
+
+    <link rel="icon" type="image/x-icon" href="/wotlk/assets/favicon_io/favicon.ico">
+
+    <meta name="description" content="Simulations for World of Warcraft® Classic Wrath of the Lich King.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="preload" href="/wotlk/assets/database/db.json" as="fetch" crossOrigin="anonymous">
+
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.31.3/js/jquery.tablesorter.min.js" integrity="sha512-qzgd5cYSZcosqpzpn7zF2ZId8f/8CHmFKZ8j7mU4OUXTNRd5g+ZHBPsgKEwoqxCtdQvExE5LprwwPAgoicguNg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.5.1/chart.min.js" integrity="sha512-Wt1bJGtlnMtGP0dqNFH1xlkLBNpEodaiQ8ZN5JLA5wpc1sUlk/O5uuOMNgvzddzkpvZ9GLyYNa8w2s7rqiTk5Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.0.4/pako.min.js" type="module"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-T3HBB0LXNX"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-YEJ8MEHGV2');
+    </script>
+    <script type="module" crossorigin src="/wotlk/bundle/index-3382aeef.entry.js"></script>
+    <link rel="modulepreload" crossorigin href="/wotlk/bundle/index-30ff6210.chunk.js">
+    <link rel="modulepreload" crossorigin href="/wotlk/bundle/detailed_results-313b59ef.chunk.js">
+    <link rel="modulepreload" crossorigin href="/wotlk/bundle/preset_utils-c04d6aea.chunk.js">
+    <link rel="modulepreload" crossorigin href="/wotlk/bundle/sim-f9b6f45d.chunk.js">
+    <link rel="modulepreload" crossorigin href="/wotlk/bundle/sim-561c77ef.chunk.js">
+    <link rel="modulepreload" crossorigin href="/wotlk/bundle/sim-0a7de6f8.chunk.js">
+    <link rel="modulepreload" crossorigin href="/wotlk/bundle/suggest_gems_action-26ebe976.chunk.js">
+    <link rel="modulepreload" crossorigin href="/wotlk/bundle/apl_utils-820cba2e.chunk.js">
+    <link rel="modulepreload" crossorigin href="/wotlk/bundle/sim-07577338.chunk.js">
+    <link rel="modulepreload" crossorigin href="/wotlk/bundle/sim-bb625b5c.chunk.js">
+    <link rel="modulepreload" crossorigin href="/wotlk/bundle/sim-08c4126f.chunk.js">
+    <link rel="modulepreload" crossorigin href="/wotlk/bundle/totem_inputs-ffe8021f.chunk.js">
+    <link rel="modulepreload" crossorigin href="/wotlk/bundle/sim-06031897.chunk.js">
+    <link rel="modulepreload" crossorigin href="/wotlk/bundle/sim-df320357.chunk.js">
+    <link rel="modulepreload" crossorigin href="/wotlk/bundle/sim-f343491e.chunk.js">
+    <link rel="modulepreload" crossorigin href="/wotlk/bundle/sim-6e64193f.chunk.js">
+    <link rel="modulepreload" crossorigin href="/wotlk/bundle/sim-97384be6.chunk.js">
+    <link rel="modulepreload" crossorigin href="/wotlk/bundle/sim-2fd22a58.chunk.js">
+    <link rel="modulepreload" crossorigin href="/wotlk/bundle/sim-dc82b589.chunk.js">
+    <link rel="modulepreload" crossorigin href="/wotlk/bundle/sim-b779f45e.chunk.js">
+    <link rel="modulepreload" crossorigin href="/wotlk/bundle/sim-02763e63.chunk.js">
+    <link rel="modulepreload" crossorigin href="/wotlk/bundle/sim-fada7847.chunk.js">
+    <link rel="modulepreload" crossorigin href="/wotlk/bundle/presets-fe7018db.chunk.js">
+    <link rel="modulepreload" crossorigin href="/wotlk/bundle/sim-4cb7b8ab.chunk.js">
+    <link rel="modulepreload" crossorigin href="/wotlk/bundle/sim-685691cd.chunk.js">
+    <link rel="modulepreload" crossorigin href="/wotlk/bundle/sim-a370854c.chunk.js">
+    <link rel="modulepreload" crossorigin href="/wotlk/bundle/sim-153d159a.chunk.js">
+    <link rel="modulepreload" crossorigin href="/wotlk/bundle/sim-e778ccc4.chunk.js">
+    <link rel="stylesheet" href="/wotlk/bundle/index-261982f5.style.css">
+  </head>
+  <body id="bootstrap-overrides">
+  </body>
+  <!-- Load wowhead scripts after done loading everything else -->
+  <!--<script>const whTooltips = {colorLinks: true};</script>
+  <script src="https://wow.zamimg.com/js/tooltips.js"></script>-->
+	<!--<script>const aowow_tooltips = {colorlinks: true}</script>
+	<script type="text/javascript" src="https://wotlk.evowow.com/static/widgets/power.js"></script>-->
+  <script type="text/javascript" src="/wotlk/tooltips.js"></script><script>var aowow_tooltips = { "colorlinks": false, "iconizelinks": false, "renamelinks": false }</script>
+</html>
