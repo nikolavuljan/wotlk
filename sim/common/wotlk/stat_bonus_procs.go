@@ -626,6 +626,19 @@ func init() {
 		ICD:        time.Second * 60,
 	})
 	newProcStatBonusEffect(ProcStatBonusEffect{
+		// Atiesh (Whitemane) priest p3
+		Name:       "Frostforged Sage",
+		ID:         132008,
+		AuraID:     72416,
+		Bonus:      stats.Stats{stats.SpellPower: 326},
+		Duration:   time.Second * 10,
+		Callback:   core.CallbackOnSpellHitDealt,
+		ProcMask:   core.ProcMaskSpellDamage,
+		Outcome:    core.OutcomeLanded,
+		ProcChance: 0.10,
+		ICD:        time.Second * 60,
+	})
+	newProcStatBonusEffect(ProcStatBonusEffect{
 		// Ashen Band of Unmatched Vengeance
 		Name:     "Frostforged Champion",
 		ID:       50401,

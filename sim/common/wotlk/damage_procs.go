@@ -229,4 +229,66 @@ func init() {
 			},
 		})
 	})
+
+	// Nightwing
+	core.NewItemEffect(132009, func(agent core.Agent) {
+		character := agent.GetCharacter()
+
+		var storedDamage float64
+		ravenUnleashSpell := character.GetOrRegisterSpell(core.SpellConfig{
+			ActionID:    core.ActionID{SpellID: 932009},
+			SpellSchool: core.SpellSchoolShadow,
+			ProcMask:    core.ProcMaskEmpty,
+
+			DamageMultiplier: 1,
+			CritMultiplier:   character.DefaultSpellCritMultiplier(),
+			ThreatMultiplier: 1,
+
+			ApplyEffects: func(sim *core.Simulation, target *core.Unit, spell *core.Spell) {
+				spell.CalcAndDealDamage(sim, target, storedDamage, spell.OutcomeMagicHitAndCrit)
+			},
+		})
+
+		ravenAura := character.GetOrRegisterAura(core.Aura{
+			Label:    "Ravens",
+			ActionID: core.ActionID{SpellID: 932008},
+			Duration: time.Second * 10,
+			OnGain: func(aura *core.Aura, sim *core.Simulation) {
+				storedDamage = 0
+			},
+			OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, result *core.SpellResult) {
+				if result.Damage > 0 && spell.ProcMask.Matches(core.ProcMaskSpellDamage|core.ProcMaskProc) {
+					storedDamage += result.Damage * 0.21
+				}
+			},
+			OnPeriodicDamageDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, result *core.SpellResult) {
+				if result.Damage > 0 && spell.ProcMask.Matches(core.ProcMaskSpellDamage|core.ProcMaskProc) {
+					storedDamage += result.Damage * 0.21
+				}
+			},
+			OnExpire: func(aura *core.Aura, sim *core.Simulation) {
+				if storedDamage <= 0 || character.CurrentTarget == nil {
+					return
+				}
+
+				ravenUnleashSpell.Cast(sim, character.CurrentTarget)
+			},
+		})
+
+		core.MakeProcTriggerAura(&character.Unit, core.ProcTrigger{
+			Name:            "Ravens Trigger",
+			ActionID:        core.ActionID{ItemID: 132009},
+			Callback:        core.CallbackOnCastComplete,
+			ProcMask:        core.ProcMaskSpellDamage,
+			ProcMaskExclude: core.ProcMaskProc,
+			ProcChance:      0.10,
+			Handler: func(sim *core.Simulation, _ *core.Spell, _ *core.SpellResult) {
+				if ravenAura.IsActive() {
+					return
+				}
+
+				ravenAura.Activate(sim)
+			},
+		})
+	})
 }

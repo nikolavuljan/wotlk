@@ -23,9 +23,15 @@ var fixScythe
 // Atiesh tooltip hack
 var atieshPriestMageTxt = '<table><tr><td><b class="q5">Atiesh, Greatstaff of the Guardian</b><br /><!--bo-->Binds when picked up<br />Unique<table width="100%"><tr><td>Two-Hand</td><th>Staff</th></tr></table><table width="100%"><tr><td><!--dmg-->231 - 427 Damage</td><th>Speed <!--spd-->2.10</th></tr></table><!--dps-->(156.7 damage per second)<br /><span class="c11"><!--fap-->(1426 Feral Attack Power)</span><br /><span><!--stat7-->+108 Stamina</span><br /><span><!--stat5-->+128 Intellect</span><br />_ATPH_Durability 145 / 145<br />Requires Level 80<br />Item Level 232<br /></td></tr></table><table><tr><td><span class="q2">Equip: Improves critical strike rating by <!--rtg32-->113&nbsp;<small>(<!--rtg%32-->2.46%&nbsp;@&nbsp;L<!--lvl-->80)</small>.</span><br /><span class="q2">Equip: Increases your haste rating by <!--rtg36-->108&nbsp;<small>(<!--rtg%36-->3.29%&nbsp;@&nbsp;L<!--lvl-->80)</small>.</span><br /><span class="q2">Equip: Increases spell power by <!--rtg45-->550.</span><br /><span class="q2">Equip: Your offensive spells have a chance on hit to increase your spell power by 285 for 10 sec.</span><br /><div class="q1 whtt-sellprice">Sell Price: <span class="moneygold">28</span> <span class="moneysilver">23</span> <span class="moneycopper">25</span></div></td></tr></table><!--?132005:1:80:80-->'
 var atieshDruidTxt = '<table><tr><td><b class="q5">Atiesh, Greatstaff of the Guardian</b><br /><!--bo-->Binds when picked up<br />Unique<table width="100%"><tr><td>Two-Hand</td><th>Staff</th></tr></table><table width="100%"><tr><td><!--dmg-->231 - 427 Damage</td><th>Speed <!--spd-->2.10</th></tr></table><!--dps-->(156.7 damage per second)<br /><span class="c11"><!--fap-->(1426 Feral Attack Power)</span><br /><span><!--stat7-->+108 Stamina</span><br /><span><!--stat5-->+128 Intellect</span><br />_ATPH_Durability 145 / 145<br />Requires Level 80<br />Item Level 232<br /></td></tr></table><table><tr><td><span class="q2">Equip: Improves hit rating by <!--rtg31-->120&nbsp;<small>(<!--rtg%31-->3.66%&nbsp;@&nbsp;L<!--lvl-->80)</small>.</span><br /><span class="q2">Equip: Improves critical strike rating by <!--rtg32-->113&nbsp;<small>(<!--rtg%32-->2.46%&nbsp;@&nbsp;L<!--lvl-->80)</small>.</span><br /><span class="q2">Equip: Increases spell power by <!--rtg45-->550.</span><br /><span class="q2">Equip: Your offensive spells have a chance on hit to increase your spell power by 285 for 10 sec.</span><br /><div class="q1 whtt-sellprice">Sell Price: <span class="moneygold">28</span> <span class="moneysilver">23</span> <span class="moneycopper">25</span></div></td></tr></table><!--?132005:1:80:80-->'
+var atieshPriest258Txt = '<table><tr><td><b class="q5">Atiesh, Greatstaff of the Guardian</b><br /><!--bo-->Binds when picked up<br />Unique<table width="100%"><tr><td>Two-Hand</td><th>Staff</th></tr></table><table width="100%"><tr><td><!--dmg-->231 - 427 Damage</td><th>Speed <!--spd-->2.10</th></tr></table><!--dps-->(156.7 damage per second)<br /><span class="c11"><!--fap-->(1426 Feral Attack Power)</span><br /><span><!--stat7-->+108 Stamina</span><br /><span><!--stat5-->+128 Intellect</span><br />_ATPH258_Durability 145 / 145<br />Requires Level 80<br />Item Level 258<br /></td></tr></table><table><tr><td><span class="q2">Equip: Improves critical strike rating by <!--rtg32-->144&nbsp;<small>(<!--rtg%32-->3.14%&nbsp;@&nbsp;L<!--lvl-->80)</small>.</span><br /><span class="q2">Equip: Increases your haste rating by <!--rtg36-->137&nbsp;<small>(<!--rtg%36-->4.18%&nbsp;@&nbsp;L<!--lvl-->80)</small>.</span><br /><span class="q2">Equip: Increases spell power by <!--rtg45-->701.</span><br /><span class="q2">Equip: Your offensive spells have a chance on hit to increase your spell power by 326 for 10 sec.</span><br /><div class="q1 whtt-sellprice">Sell Price: <span class="moneygold">28</span> <span class="moneysilver">23</span> <span class="moneycopper">25</span></div></td></tr></table><!--?132008:1:80:80-->'
 var atieshFake = 45886 // Icecore Staff (has same sockets and bonus as Atiesh)
 var fixAtiesh1
 var fixAtiesh2
+var fixAtiesh3
+// Nightwing tooltip hack
+var nightwingTxt = '<table><tr><td><b class="q5">Nightwing</b><br /><!--bo-->Binds when picked up<br />Unique<table width="100%"><tr><td>Two-Hand</td><th>Staff</th></tr></table><table width="100%"><tr><td><!--dmg-->347 - 641 Damage</td><th>Speed <!--spd-->2.60</th></tr></table><!--dps-->(190.0 damage per second)<br /><span><!--stat7-->+137 Stamina</span><br /><span><!--stat5-->+151 Intellect</span><br />_NWPH_Durability 145 / 145<br />Requires Level 80<br />Item Level 258<br /></td></tr></table><table><tr><td><span class="q2">Equip: Improves critical strike rating by <!--rtg32-->117&nbsp;<small>(<!--rtg%32-->2.55%&nbsp;@&nbsp;L<!--lvl-->80)</small>.</span><br /><span class="q2">Equip: Increases your haste rating by <!--rtg36-->117&nbsp;<small>(<!--rtg%36-->3.57%&nbsp;@&nbsp;L<!--lvl-->80)</small>.</span><br /><span class="q2">Equip: Increases spell power by <!--rtg45-->701.</span><br /><span class="q2">Equip: Your offensive spell casts have a 10% chance to summon a raven for 10 sec. The raven stores damage equal to 21% of your spell damage dealt, and unleashes it when it expires.</span><br /><div class="q1 whtt-sellprice">Sell Price: <span class="moneygold">36</span> <span class="moneysilver">35</span> <span class="moneycopper">18</span></div></td></tr></table><!--?132009:1:80:80-->'
+var nightwingFake = 50648 // Nibelung (heroic) has matching 3 sockets (red, blue, yellow)
+var fixNightwing
 
 if (typeof $WH == "undefined") {
     $WH = { wowheadRemote: true };
@@ -576,8 +582,14 @@ if (typeof $WowheadPower == "undefined") {
 
             fixAtiesh1 = (id == 132005 || id == 132007)
             fixAtiesh2 = id == 132006
-            if (fixAtiesh1 || fixAtiesh2) {
+            fixAtiesh3 = id == 132008
+            if (fixAtiesh1 || fixAtiesh2 || fixAtiesh3) {
                 id = atieshFake
+            }
+
+            fixNightwing = id == 132009
+            if (fixNightwing) {
+                id = nightwingFake
             }
 
 
@@ -702,7 +714,7 @@ if (typeof $WowheadPower == "undefined") {
                 }
             }
 
-            if ((fixAtiesh1 || fixAtiesh2) && currentType == 3 && currentId.startsWith(atieshFake.toString())) {
+            if ((fixAtiesh1 || fixAtiesh2 || fixAtiesh3) && currentType == 3 && currentId.startsWith(atieshFake.toString())) {
                 icon = "inv_staff_medivh"
                 var txt = html.match(/((?:<span class="q2">)?<!--e-->.*?)Durability/)
                 if (txt) {
@@ -710,7 +722,18 @@ if (typeof $WowheadPower == "undefined") {
                         html = atieshPriestMageTxt.replace("_ATPH_", txt[1])
                     } else if (fixAtiesh2) {
                         html = atieshDruidTxt.replace("_ATPH_", txt[1])
+                    } else if (fixAtiesh3) {
+                        html = atieshPriest258Txt.replace("_ATPH258_", txt[1])
                     }
+                }
+            }
+
+            if (fixNightwing && currentType == 3 && currentId.startsWith(nightwingFake.toString())) {
+                icon = "inv_staff_107"
+                var txt = html.match(/((?:<span class="q2">)?<!--e-->.*?)Durability/)
+                if (txt) {
+                    html = nightwingTxt.replace("_NWPH_", txt[1])
+                    html = html.replace(/\+9 Spell Power/g, "+7 Spell Power")
                 }
             }
 
