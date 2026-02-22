@@ -195,6 +195,57 @@ func init() {
 			},
 		})
 	})
+
+	// Doomhammer
+	core.NewItemEffect(132010, func(agent core.Agent) {
+		shaman := agent.(ShamanAgent).GetShaman()
+
+		lavaSurgeAura := shaman.RegisterAura(core.Aura{
+			Label:    "Lava Surge",
+			ActionID: core.ActionID{ItemID: 132010, Tag: 1},
+			Duration: time.Second * 10,
+			OnGain: func(aura *core.Aura, sim *core.Simulation) {
+				shaman.LavaBurst.CastTimeMultiplier -= 1
+			},
+			OnExpire: func(aura *core.Aura, sim *core.Simulation) {
+				shaman.LavaBurst.CastTimeMultiplier += 1
+			},
+			OnCastComplete: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell) {
+				if spell != shaman.LavaBurst {
+					return
+				}
+
+				// If Lava Burst was already hardcasting when this proc occurred, don't consume the buff.
+				if spell.CurCast.CastTime > 0 {
+					return
+				}
+
+				aura.Deactivate(sim)
+			},
+		})
+
+		shaman.RegisterAura(core.Aura{
+			Label:    "Doomhammer",
+			Duration: core.NeverExpires,
+			OnReset: func(aura *core.Aura, sim *core.Simulation) {
+				aura.Activate(sim)
+			},
+			OnPeriodicDamageDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, result *core.SpellResult) {
+				if spell.ActionID.SpellID != shaman.FlameShock.ActionID.SpellID || !result.Landed() {
+					return
+				}
+				if sim.RandomFloat("doomhammer lava surge") > 0.20 {
+					return
+				}
+
+				// If Lava Burst is already being hardcast, keep reset behavior "wasted" and only grant instant cast.
+				if !(shaman.Hardcast.Expires > sim.CurrentTime && shaman.Hardcast.ActionID == shaman.LavaBurst.ActionID) {
+					shaman.LavaBurst.CD.Reset()
+				}
+				lavaSurgeAura.Activate(sim)
+			},
+		})
+	})
 }
 
 var ItemSetEarthshatterBattlegear = core.NewItemSet(core.ItemSet{

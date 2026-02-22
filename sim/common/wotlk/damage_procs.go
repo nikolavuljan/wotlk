@@ -236,16 +236,17 @@ func init() {
 
 		var storedDamage float64
 		ravenUnleashSpell := character.GetOrRegisterSpell(core.SpellConfig{
-			ActionID:    core.ActionID{SpellID: 932009},
+			ActionID:    core.ActionID{ItemID: 132009, Tag: 1},
 			SpellSchool: core.SpellSchoolShadow,
 			ProcMask:    core.ProcMaskEmpty,
+			Flags:       core.SpellFlagIgnoreModifiers | core.SpellFlagIgnoreResists | core.SpellFlagNoOnDamageDealt,
 
 			DamageMultiplier: 1,
-			CritMultiplier:   character.DefaultSpellCritMultiplier(),
+			CritMultiplier:   1,
 			ThreatMultiplier: 1,
 
 			ApplyEffects: func(sim *core.Simulation, target *core.Unit, spell *core.Spell) {
-				spell.CalcAndDealDamage(sim, target, storedDamage, spell.OutcomeMagicHitAndCrit)
+				spell.CalcAndDealDamage(sim, target, storedDamage, spell.OutcomeAlwaysHit)
 			},
 		})
 
@@ -257,14 +258,20 @@ func init() {
 				storedDamage = 0
 			},
 			OnSpellHitDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, result *core.SpellResult) {
-				if result.Damage > 0 && spell.ProcMask.Matches(core.ProcMaskSpellDamage|core.ProcMaskProc) {
-					storedDamage += result.Damage * 0.21
+				// Count all non-melee/ranged spell damage, including internal spell ticks/procs
+				// (e.g. Mind Flay tick spell), so this tracks 21% of real spell damage dealt.
+				if result.Damage <= 0 || spell.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+					return
 				}
+
+				storedDamage += result.Damage * 0.21
 			},
 			OnPeriodicDamageDealt: func(aura *core.Aura, sim *core.Simulation, spell *core.Spell, result *core.SpellResult) {
-				if result.Damage > 0 && spell.ProcMask.Matches(core.ProcMaskSpellDamage|core.ProcMaskProc) {
-					storedDamage += result.Damage * 0.21
+				if result.Damage <= 0 || spell.ProcMask.Matches(core.ProcMaskMeleeOrRanged) {
+					return
 				}
+
+				storedDamage += result.Damage * 0.21
 			},
 			OnExpire: func(aura *core.Aura, sim *core.Simulation) {
 				if storedDamage <= 0 || character.CurrentTarget == nil {
@@ -282,6 +289,7 @@ func init() {
 			ProcMask:        core.ProcMaskSpellDamage,
 			ProcMaskExclude: core.ProcMaskProc,
 			ProcChance:      0.10,
+			ICD:             time.Minute,
 			Handler: func(sim *core.Simulation, _ *core.Spell, _ *core.SpellResult) {
 				if ravenAura.IsActive() {
 					return

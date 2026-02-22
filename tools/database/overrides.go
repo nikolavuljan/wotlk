@@ -90,6 +90,40 @@ var ItemOverrides = []*proto.UIItem{
 		Quality:         proto.ItemQuality_ItemQualityLegendary,
 		Unique:          true,
 	},
+	{
+		Id:         132010,
+		Name:       "Doomhammer",
+		Icon:       "inv_mace_17",
+		Type:       proto.ItemType_ItemTypeWeapon,
+		WeaponType: proto.WeaponType_WeaponTypeMace,
+		HandType:   proto.HandType_HandTypeMainHand,
+		Stats: stats.Stats{
+			stats.Stamina:    58,
+			stats.Intellect:  58,
+			stats.SpellPower: 621,
+			stats.SpellCrit:  39,
+			stats.SpellHaste: 57,
+			stats.MeleeCrit:  39,
+			stats.MeleeHaste: 57,
+		}.ToFloatArray(),
+		GemSockets: []proto.GemColor{
+			proto.GemColor_GemColorYellow,
+		},
+		SocketBonus: stats.Stats{
+			stats.SpellHaste: 4,
+			stats.MeleeHaste: 4,
+		}.ToFloatArray(),
+		WeaponDamageMin: 357,
+		WeaponDamageMax: 666,
+		WeaponSpeed:     2.6,
+		Ilvl:            258,
+		Phase:           3,
+		Quality:         proto.ItemQuality_ItemQualityLegendary,
+		Unique:          true,
+		ClassAllowlist: []proto.Class{
+			proto.Class_ClassShaman,
+		},
+	},
 
 	// Balance T9 "of Conquest" Alliance set
 	{Id: 48158, SetName: "Malfurion's Regalia"},

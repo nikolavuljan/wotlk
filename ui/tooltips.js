@@ -32,6 +32,10 @@ var fixAtiesh3
 var nightwingTxt = '<table><tr><td><b class="q5">Nightwing</b><br /><!--bo-->Binds when picked up<br />Unique<table width="100%"><tr><td>Two-Hand</td><th>Staff</th></tr></table><table width="100%"><tr><td><!--dmg-->347 - 641 Damage</td><th>Speed <!--spd-->2.60</th></tr></table><!--dps-->(190.0 damage per second)<br /><span><!--stat7-->+137 Stamina</span><br /><span><!--stat5-->+151 Intellect</span><br />_NWPH_Durability 145 / 145<br />Requires Level 80<br />Item Level 258<br /></td></tr></table><table><tr><td><span class="q2">Equip: Improves critical strike rating by <!--rtg32-->117&nbsp;<small>(<!--rtg%32-->2.55%&nbsp;@&nbsp;L<!--lvl-->80)</small>.</span><br /><span class="q2">Equip: Increases your haste rating by <!--rtg36-->117&nbsp;<small>(<!--rtg%36-->3.57%&nbsp;@&nbsp;L<!--lvl-->80)</small>.</span><br /><span class="q2">Equip: Increases spell power by <!--rtg45-->701.</span><br /><span class="q2">Equip: Your offensive spell casts have a 10% chance to summon a raven for 10 sec. The raven stores damage equal to 21% of your spell damage dealt, and unleashes it when it expires.</span><br /><div class="q1 whtt-sellprice">Sell Price: <span class="moneygold">36</span> <span class="moneysilver">35</span> <span class="moneycopper">18</span></div></td></tr></table><!--?132009:1:80:80-->'
 var nightwingFake = 50648 // Nibelung (heroic) has matching 3 sockets (red, blue, yellow)
 var fixNightwing
+// Doomhammer tooltip hack
+var doomhammerTxt = '<table><tr><td><b class="q5">Doomhammer</b><br /><!--bo-->Binds when picked up<br />Unique<table width="100%"><tr><td>Main Hand</td><th>Mace</th></tr></table><table width="100%"><tr><td><!--dmg-->357 - 666 Damage</td><th>Speed <!--spd-->2.60</th></tr></table><!--dps-->(196.73 damage per second)<br /><span><!--stat7-->+58 Stamina</span><br /><span><!--stat5-->+58 Intellect</span><br />_DHMH_Durability 125 / 125<br />Classes: <a href="?class=7" class="c7">Shaman</a><br />Requires Level 80<br />Item Level 258<br /></td></tr></table><table><tr><td><span class="q2">Equip: Improves critical strike rating by <!--rtg32-->39&nbsp;<small>(<!--rtg%32-->0.85%&nbsp;@&nbsp;L<!--lvl-->80)</small>.</span><br /><span class="q2">Equip: Increases your haste rating by <!--rtg36-->57&nbsp;<small>(<!--rtg%36-->1.74%&nbsp;@&nbsp;L<!--lvl-->80)</small>.</span><br /><span class="q2">Equip: Increases spell power by <!--rtg45-->621.</span><br /><span class="q2">Equip: Your Flame Shock periodic damage has a 20% chance to reset Lava Burst and grant Lava Surge, making your next Lava Burst instant within 10 sec.</span><br /><div class="q1 whtt-sellprice">Sell Price: <span class="moneygold">31</span> <span class="moneysilver">15</span> <span class="moneycopper">42</span></div></td></tr></table><!--?132010:1:80:80-->'
+var doomhammerFake = 50685 // Trauma has matching 1 yellow socket
+var fixDoomhammer
 
 if (typeof $WH == "undefined") {
     $WH = { wowheadRemote: true };
@@ -592,6 +596,11 @@ if (typeof $WowheadPower == "undefined") {
                 id = nightwingFake
             }
 
+            fixDoomhammer = id == 132010
+            if (fixDoomhammer) {
+                id = doomhammerFake
+            }
+
 
             if (!params) {
                 params = {};
@@ -734,6 +743,15 @@ if (typeof $WowheadPower == "undefined") {
                 if (txt) {
                     html = nightwingTxt.replace("_NWPH_", txt[1])
                     html = html.replace(/\+9 Spell Power/g, "+7 Spell Power")
+                }
+            }
+
+            if (fixDoomhammer && currentType == 3 && currentId.startsWith(doomhammerFake.toString())) {
+                icon = "inv_mace_17"
+                var txt = html.match(/((?:<span class="q2">)?<!--e-->.*?)Durability/)
+                if (txt) {
+                    html = doomhammerTxt.replace("_DHMH_", txt[1])
+                    html = html.replace(/\+5 Spell Power/g, "+4 Haste Rating")
                 }
             }
 

@@ -446,6 +446,16 @@ export class ActionId {
 					name += ' (MT)';
 				}
 				break;
+			case 'Nightwing':
+				if (this.tag == 1) {
+					name = 'Ravens';
+				}
+				break;
+			case 'Doomhammer':
+				if (this.tag == 1) {
+					name = 'Lava Surge';
+				}
+				break;
 			default:
 				if (this.tag) {
 					name += ' (??)';
