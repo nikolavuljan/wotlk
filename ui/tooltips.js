@@ -120,6 +120,9 @@ var __WOTLK_FORCE_LOCAL_TOOLTIPS = true;
             ".wotlk-local-tooltip .q4{color:#a335ee}" +
             ".wotlk-local-tooltip .q5{color:#ff8000}" +
             ".wotlk-local-tooltip .q8{color:#ffd100}" +
+            ".wotlk-local-tooltip .wotlk-set-piece-missing,.wotlk-local-tooltip .wotlk-set-piece-missing a{color:#7f7f7f !important}" +
+            ".wotlk-local-tooltip .wotlk-set-bonus-active,.wotlk-local-tooltip .wotlk-set-bonus-active a{color:#1eff00 !important}" +
+            ".wotlk-local-tooltip .wotlk-set-bonus-missing,.wotlk-local-tooltip .wotlk-set-bonus-missing a{color:#7f7f7f !important}" +
             ".wotlk-local-tooltip a{color:#9ecbff !important;text-decoration:none}" +
             ".wotlk-local-tooltip a[class*='socket-']{display:inline-flex;align-items:center;min-height:14px;padding-left:18px;background-repeat:no-repeat;background-size:14px 14px;background-position:left center}" +
             ".wotlk-local-tooltip a.socket-red{background-image:url('https://wow.zamimg.com/images/icons/socket-red.gif')}" +
@@ -341,11 +344,14 @@ var __WOTLK_FORCE_LOCAL_TOOLTIPS = true;
                 return html;
             }
 
-            var n = 0;
+            var equippedCount = 0;
             var setPieceAliases = {
                 131001: [131001, 32837],
                 131002: [131002, 32838],
+                32837: [32837, 131001],
+                32838: [32838, 131002],
             };
+            var equippedSetPieceIds = {};
 
             for (var i = 0; i < params.pcs.length; ++i) {
                 var setItemId = parseInt(params.pcs[i], 10);
@@ -354,35 +360,33 @@ var __WOTLK_FORCE_LOCAL_TOOLTIPS = true;
                 }
 
                 var candidateIds = setPieceAliases[setItemId] || [setItemId];
-                var matchedAnyCandidate = false;
-
                 for (var c = 0; c < candidateIds.length; ++c) {
-                    var candidateId = candidateIds[c];
-                    var setItemRegex = new RegExp('<span><!--si([0-9]+:)*' + candidateId + '(:[0-9]+)*--><a href="[^"]*item=([0-9]+)[^"]*">(.+?)</a></span>');
-                    var matchedSetItem = html.match(setItemRegex);
-                    if (!matchedSetItem) {
-                        continue;
-                    }
-
-                    html = html.replace(matchedSetItem[0], function (fullMatch) {
-                        if (fullMatch.indexOf('class="q8"') !== -1) {
-                            return fullMatch;
-                        }
-                        return fullMatch.replace("<span>", '<span class="q8">');
-                    });
-                    matchedAnyCandidate = true;
-                    break;
-                }
-
-                if (matchedAnyCandidate) {
-                    ++n;
+                    equippedSetPieceIds[candidateIds[c]] = true;
                 }
             }
 
-            if (n > 0) {
-                html = html.replace("(0/", "(" + n + "/");
-                html = html.replace(new RegExp("<span>\\(([0-" + n + "])\\)", "g"), '<span class="q2">($1)');
+            html = html.replace(/<span(?: class="[^"]*")?>(<!--si([0-9:]+)--><a href="[^"]*item=([0-9]+)[^"]*">(.+?)<\/a>)<\/span>/g, function (_fullMatch, innerHtml, _siToken, itemIdStr) {
+                var tooltipSetItemId = parseInt(itemIdStr, 10);
+                if (equippedSetPieceIds[tooltipSetItemId]) {
+                    ++equippedCount;
+                    return '<span class="q8">' + innerHtml + '</span>';
+                }
+
+                return '<span class="wotlk-set-piece-missing">' + innerHtml + '</span>';
+            });
+
+            if (equippedCount > 0) {
+                html = html.replace(/\(0\/([0-9]+)\)/, "(" + equippedCount + "/$1)");
+                html = html.replace(/<span>\(([0-9]+)\)/g, function (fullMatch, countStr) {
+                    return parseInt(countStr, 10) <= equippedCount ? '<span class="q2">(' + countStr + ')' : fullMatch;
+                });
             }
+
+            html = html.replace(/<span>(\(([0-9]+)\)\s*Set\s*:[\s\S]*?)<\/span>/g, function (_fullMatch, innerHtml, requiredCountStr) {
+                var requiredCount = parseInt(requiredCountStr, 10);
+                var bonusClass = requiredCount <= equippedCount ? "wotlk-set-bonus-active" : "wotlk-set-bonus-missing";
+                return '<span class="' + bonusClass + '">' + innerHtml + "</span>";
+            });
 
             return html;
         }
