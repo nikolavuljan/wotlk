@@ -49,6 +49,12 @@ const createGemContainer = (socketColor: GemColor, gem: Gem | null) => {
 	);
 
 	if (gem != null) {
+		const gemTooltipData = `item=${gem.id}&domain=wotlk`;
+		gemContainer.dataset.wowhead = gemTooltipData;
+		gemIconElem.value!.dataset.wowhead = gemTooltipData;
+		gemContainer.dataset.whtticon = 'false';
+		gemIconElem.value!.dataset.whtticon = 'false';
+
 		ActionId.fromItemId(gem.id)
 			.fill()
 			.then(filledId => {
