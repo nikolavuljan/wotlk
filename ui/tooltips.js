@@ -141,7 +141,7 @@ var __WOTLK_FORCE_LOCAL_TOOLTIPS = true;
             ".wotlk-local-tooltip .wotlk-set-bonus-missing,.wotlk-local-tooltip .wotlk-set-bonus-missing a{color:#7f7f7f !important}" +
             ".wotlk-local-tooltip .wotlk-socket-bonus-active,.wotlk-local-tooltip .wotlk-socket-bonus-active a{color:#1eff00 !important}" +
             ".wotlk-local-tooltip .wotlk-socket-bonus-missing,.wotlk-local-tooltip .wotlk-socket-bonus-missing a{color:#7f7f7f !important}" +
-            ".wotlk-local-tooltip a{color:#9ecbff !important;text-decoration:none}" +
+            ".wotlk-local-tooltip a{color:inherit !important;text-decoration:none}" +
             ".wotlk-local-tooltip a.socket-red,.wotlk-local-tooltip a.socket-yellow,.wotlk-local-tooltip a.socket-blue,.wotlk-local-tooltip a.socket-meta,.wotlk-local-tooltip a.socket-prismatic{display:inline-flex;align-items:center;min-height:14px;padding-left:18px;background-repeat:no-repeat;background-size:14px 14px;background-position:left center}" +
             ".wotlk-local-tooltip a.socket-red{background-image:url('https://wow.zamimg.com/images/icons/socket-red.gif')}" +
             ".wotlk-local-tooltip a.socket-yellow{background-image:url('https://wow.zamimg.com/images/icons/socket-yellow.gif')}" +
