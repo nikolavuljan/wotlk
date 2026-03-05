@@ -37,7 +37,301 @@ var doomhammerTxt = '<table><tr><td><b class="q5">Doomhammer</b><br /><!--bo-->B
 var doomhammerFake = 50685 // Trauma has matching 1 yellow socket
 var fixDoomhammer
 
-if (typeof $WH == "undefined") {
+// Hard switch for testing: disable legacy EvoWoW/Wowhead runtime and use only local CSV tooltips.
+var __WOTLK_FORCE_LOCAL_TOOLTIPS = true;
+
+// Local tooltip fallback:
+// If remote Wowhead/Evowow resources fail (CORS/CORP/challenge), load tooltip HTML from
+// same-origin static CSV files that are already shipped in assets/db_inputs.
+(function scheduleLocalTooltipFallback() {
+    var installAttempts = 0;
+
+    function hasLegacyTooltipRuntime() {
+        return !!(
+            window.$WH &&
+            typeof window.$WH.g_ajaxIshRequest === "function" &&
+            window.$WH.Tooltip
+        );
+    }
+
+    function installLocalTooltipRuntime() {
+        if (window.__wotlkLocalTooltipsInstalled) {
+            return;
+        }
+        window.__wotlkLocalTooltipsInstalled = true;
+
+        var REPO_NAME = "wotlk";
+        var pathParts = window.location.pathname.split("/");
+        var repoIdx = pathParts.indexOf(REPO_NAME);
+        var repoBase = repoIdx === -1 ? "" : "/" + REPO_NAME;
+        var itemCsvUrl = repoBase + "/assets/db_inputs/wowhead_item_tooltips.csv";
+        var spellCsvUrl = repoBase + "/assets/db_inputs/wowhead_spell_tooltips.csv";
+
+        var itemMapPromise = null;
+        var spellMapPromise = null;
+        var activeAnchor = null;
+        var activeRequestId = 0;
+        var cursorX = 0;
+        var cursorY = 0;
+
+        var tooltipEl = document.createElement("div");
+        tooltipEl.className = "wotlk-local-tooltip";
+        tooltipEl.style.display = "none";
+
+        var styleEl = document.createElement("style");
+        styleEl.textContent =
+            ".wotlk-local-tooltip{position:fixed;z-index:2147483000;max-width:520px;max-height:70vh;overflow:auto;" +
+            "background:#111;color:#ddd;border:1px solid #3a3a3a;border-radius:6px;padding:8px;box-shadow:0 10px 28px rgba(0,0,0,.55);" +
+            "font-size:13px;line-height:1.35;pointer-events:none}" +
+            ".wotlk-local-tooltip table{width:auto !important;max-width:100%}" +
+            ".wotlk-local-tooltip td,.wotlk-local-tooltip th{font-size:13px !important;line-height:1.35 !important}" +
+            ".wotlk-local-tooltip a{color:#9ecbff !important;text-decoration:none}";
+        document.head.appendChild(styleEl);
+        document.body.appendChild(tooltipEl);
+
+        function parseCsvMap(csvText) {
+            var map = {};
+            var start = 0;
+
+            while (start < csvText.length) {
+                var end = csvText.indexOf("\n", start);
+                if (end === -1) {
+                    end = csvText.length;
+                }
+
+                var line = csvText.slice(start, end).trim();
+                start = end + 1;
+
+                if (!line) {
+                    continue;
+                }
+
+                var commaIdx = line.indexOf(",");
+                if (commaIdx <= 0) {
+                    continue;
+                }
+
+                var id = parseInt(line.slice(0, commaIdx), 10);
+                if (!id) {
+                    continue;
+                }
+
+                try {
+                    map[id] = JSON.parse(line.slice(commaIdx + 1));
+                } catch (_err) {
+                    // Skip malformed lines.
+                }
+            }
+
+            return map;
+        }
+
+        function loadCsvMap(url) {
+            return fetch(url).then(function (response) {
+                if (!response.ok) {
+                    throw new Error("Failed to load tooltip CSV: " + url);
+                }
+                return response.text();
+            }).then(function (csvText) {
+                return parseCsvMap(csvText);
+            });
+        }
+
+        function getItemMap() {
+            if (!itemMapPromise) {
+                itemMapPromise = loadCsvMap(itemCsvUrl);
+            }
+            return itemMapPromise;
+        }
+
+        function getSpellMap() {
+            if (!spellMapPromise) {
+                spellMapPromise = loadCsvMap(spellCsvUrl);
+            }
+            return spellMapPromise;
+        }
+
+        function extractTargetFromString(value) {
+            if (!value) {
+                return null;
+            }
+
+            var match = value.match(/(?:[?&#/]|^)(item|spell)=(-?\d+)(?=$|[&#/?])/i);
+            if (!match) {
+                match = value.match(/(?:^|[,\s])(item|spell)[:=](-?\d+)/i);
+            }
+
+            if (!match) {
+                return null;
+            }
+
+            var id = parseInt(match[2], 10);
+            if (!id) {
+                return null;
+            }
+
+            return {
+                type: match[1].toLowerCase(),
+                id: id,
+            };
+        }
+
+        function getAnchorTarget(anchor) {
+            if (!anchor) {
+                return null;
+            }
+
+            var datasetValue = null;
+            if (anchor.dataset && Object.prototype.hasOwnProperty.call(anchor.dataset, "wowhead")) {
+                datasetValue = anchor.dataset.wowhead;
+            } else if (anchor.getAttribute) {
+                datasetValue = anchor.getAttribute("data-wowhead");
+            }
+
+            return (
+                extractTargetFromString(datasetValue) ||
+                extractTargetFromString(anchor.getAttribute("rel")) ||
+                extractTargetFromString(anchor.getAttribute("href"))
+            );
+        }
+
+        function getTooltipHtml(type, id) {
+            if (type === "item") {
+                return getItemMap().then(function (map) {
+                    var entry = map[id];
+                    return entry ? (entry.tooltip || "") : "";
+                });
+            }
+            if (type === "spell") {
+                return getSpellMap().then(function (map) {
+                    var entry = map[id];
+                    if (!entry) {
+                        return "";
+                    }
+                    return entry.tooltip || entry.buff || "";
+                });
+            }
+            return Promise.resolve("");
+        }
+
+        function positionTooltip() {
+            if (tooltipEl.style.display === "none") {
+                return;
+            }
+
+            var pad = 14;
+            var left = cursorX + pad;
+            var top = cursorY + pad;
+            var rect = tooltipEl.getBoundingClientRect();
+
+            if (left + rect.width > window.innerWidth - 8) {
+                left = Math.max(8, cursorX - rect.width - pad);
+            }
+            if (top + rect.height > window.innerHeight - 8) {
+                top = Math.max(8, cursorY - rect.height - pad);
+            }
+
+            tooltipEl.style.left = left + "px";
+            tooltipEl.style.top = top + "px";
+        }
+
+        function hideTooltip() {
+            tooltipEl.style.display = "none";
+            tooltipEl.innerHTML = "";
+        }
+
+        function showTooltip(html) {
+            if (!html) {
+                hideTooltip();
+                return;
+            }
+            tooltipEl.innerHTML = html;
+            tooltipEl.style.display = "block";
+            positionTooltip();
+        }
+
+        function findAnchor(node) {
+            while (node) {
+                if (node.tagName === "A" || node.tagName === "AREA") {
+                    return node;
+                }
+                node = node.parentNode;
+            }
+            return null;
+        }
+
+        function isInsideAnchor(node, anchor) {
+            return !!(node && anchor && (node === anchor || anchor.contains(node)));
+        }
+
+        document.addEventListener("mousemove", function (event) {
+            cursorX = event.clientX;
+            cursorY = event.clientY;
+            positionTooltip();
+        }, true);
+
+        document.addEventListener("mouseover", function (event) {
+            var anchor = findAnchor(event.target);
+            var target = getAnchorTarget(anchor);
+
+            if (!target) {
+                return;
+            }
+
+            activeAnchor = anchor;
+            activeRequestId += 1;
+            var requestId = activeRequestId;
+
+            getTooltipHtml(target.type, target.id).then(function (html) {
+                if (requestId !== activeRequestId || activeAnchor !== anchor) {
+                    return;
+                }
+                showTooltip(html);
+            }).catch(function () {
+                if (requestId === activeRequestId) {
+                    hideTooltip();
+                }
+            });
+        }, true);
+
+        document.addEventListener("mouseout", function (event) {
+            if (!activeAnchor) {
+                return;
+            }
+
+            var fromActiveAnchor = isInsideAnchor(event.target, activeAnchor);
+            var toActiveAnchor = isInsideAnchor(event.relatedTarget, activeAnchor);
+
+            if (fromActiveAnchor && !toActiveAnchor) {
+                activeAnchor = null;
+                hideTooltip();
+            }
+        }, true);
+    }
+
+    function maybeInstallFallback() {
+        if (__WOTLK_FORCE_LOCAL_TOOLTIPS) {
+            installLocalTooltipRuntime();
+            return;
+        }
+
+        if (hasLegacyTooltipRuntime()) {
+            return;
+        }
+
+        installAttempts += 1;
+        if (installAttempts < 6) {
+            setTimeout(maybeInstallFallback, 200);
+            return;
+        }
+
+        installLocalTooltipRuntime();
+    }
+
+    setTimeout(maybeInstallFallback, 200);
+})();
+
+if (!__WOTLK_FORCE_LOCAL_TOOLTIPS && typeof $WH == "undefined") {
     $WH = { wowheadRemote: true };
 
     /* custom */
@@ -45,7 +339,7 @@ if (typeof $WH == "undefined") {
     var g_staticUrl = 'https://wotlk.evowow.com/static';
 }
 
-if (typeof $WowheadPower == "undefined") {
+if (!__WOTLK_FORCE_LOCAL_TOOLTIPS && typeof $WowheadPower == "undefined") {
     var $WowheadPower = new function () {
         var isRemote = $WH.wowheadRemote;
         var
